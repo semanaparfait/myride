@@ -115,3 +115,48 @@ def calculate_ride_cost():
         "distance_km": distance_km,
         "cost_rwf": cost_rwf
     }
+    # Driver registration
+def add_driver():
+    connection = connect_db()
+    driver_choice = input("Are you Registared as driver (yes/no): ")
+    if driver_choice.lower() == "no":        
+        if connection:
+            print("Enter your credentials to register as Driver")
+            driver_name = input("Enter your name: ")
+            while True:
+                driver_phone = input("Enter your phone number: ")
+                if len(driver_phone) == 10 and driver_phone.isdigit():
+                    break
+                print("invalid phone number ❌ (must be exactly 10 digits)")
+            while True:
+                driver_password = input("Enter your password: ")
+                if len(driver_password) <= 10:
+                    break
+                print("Password must be 10 characters ")
+            while True:
+                available_seats = input("Enter the number of available seats in your car: ")
+                if available_seats.isdigit() and int(available_seats) <= 8:
+                    break
+                print("Please that car doesn't exist in our company")
+            current_location = input("Enter your current location: ")
+            destination = input("Enter your destination: ")
+    if driver_choice.lower() == "yes":
+        print("You are not registered as a driver. Please register first.")
+        driver_login()
+
+
+            
+    try:
+        cursor = connection.cursor()
+        insert_query = """
+        INSERT INTO driver (DriverName, DriverPhoneNumber, DriverPassword, AvailableSeats, CurrentLocation, Destination)
+        VALUES (%s, %s, %s, %s, %s, %s)
+        """
+        cursor.execute(insert_query, (driver_name, driver_phone, driver_password, available_seats, current_location, destination))
+        connection.commit()
+        print(f"Driver {driver_name} registered successfully!")
+    except Error as e:
+        print(f"Error: {e}")
+    finally:
+        cursor.close()
+        connection.close()
