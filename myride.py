@@ -160,3 +160,35 @@ def add_driver():
     finally:
         cursor.close()
         connection.close()
+
+# Match drivers and passengers
+def match_driver_to_passenger():
+    connection = connect_db()
+    if connection:
+        passenger_currentLocation= input("Enter your current location: ")
+        passenger_destination = input("Enter your destination: ")
+        try:
+            cursor = connection.cursor()
+            query = """
+            SELECT * FROM driver WHERE Destination = %s AND AvailableSeats > 0
+            """
+            cursor.execute(query, (passenger_destination,))
+            drivers = cursor.fetchall()
+            if drivers:
+                print("Available drivers:")
+                for driver in drivers:
+                    print(f"Driver Name: {driver[1]}, Phone: {driver[2]}, Seats Available: {driver[4]}, Location: {driver[5]}")
+                    while True:
+                        bookirde=input("Do you want to book a ride with this driver? (yes/no): ")
+                        if bookirde.lower() == "yes":
+                            add_passenger()
+                            break
+            else:
+                print("No drivers available for your destination.")
+
+        except Error as e:
+            print(f"Error: {e}")
+        finally:
+            cursor.close()
+            connection.close()
+
