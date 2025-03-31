@@ -314,3 +314,86 @@ def view_drivers(connection):
         print(f"Error: {e}")
     finally:
         cursor.close()
+
+def view_passengers(connection):
+    try:
+        cursor = connection.cursor()
+        query = "SELECT * FROM Passenger"
+        cursor.execute(query)
+        passengers = cursor.fetchall()
+        if passengers:
+            print("Passenger Details:")
+            for passenger in passengers:
+                print(f"ID: {passenger[0]}, Name: {passenger[1]}, Phone: {passenger[2]}, Pickup Location: {passenger[3]}, Destination: {passenger[4]}")
+        else:
+            print("No passengers registered.")
+    except Error as e:
+        print(f"Error: {e}")
+    finally:
+        cursor.close()
+
+# Admin login
+def admin_login():
+    connection = connect_db()
+    if connection:
+        print("Enter admin keyword to login:")
+        while True:
+            admin_keyword=input("Enter The keyword to access the admin dashboard: ").lower()
+            if admin_keyword == "myride":
+                admin_dashboard()
+                break
+            print("Invalid keyword. Please try again.")
+            
+                    
+                
+        # admin_name = input("Enter your admin name: ")
+        # admin_password = input("Enter your admin password: ")
+            # try:
+            #     cursor = connection.cursor()
+            #     query = """
+            #     SELECT * FROM Admin WHERE AdminName = %s AND AdminPassword = %s
+            #     """
+            #     cursor.execute(query, (admin_name, admin_password))
+            #     admin = cursor.fetchone()
+            #     if admin:
+            #         print(f"Welcome, {admin_name}!")
+            #         admin_dashboard()
+            #     else:
+            #         print("Invalid credentials. Please try again.")
+            # except Error as e:
+            #     print(f"Error: {e}")
+            # finally:
+            #     cursor.close()
+            #     connection.close()
+
+
+# Main menu
+def main_menu():
+    print("Welcome to My Ride!")
+    while True:
+        print("\nMenu:")
+        print("1. Continue as Driver")
+        print("2. Continue as Passenger")
+        print("3. Find a Ride")
+        print("4. Admin Login")
+        print("5. Exit")
+        choice = input("Enter your choice: ")
+        
+        if choice == '1':
+            add_driver()
+        elif choice == '2':
+            add_passenger()
+        elif choice == '3':
+            match_driver_to_passenger()
+        elif choice == '4':
+            admin_login()
+        elif choice == '5':
+            print("Thank you for using My Ride. Goodbye!")
+            print(bye_no)
+            break
+        else:
+            print("Invalid choice. Please try again.")
+
+# Run the application
+if __name__ == "__main__":
+    main_menu()
