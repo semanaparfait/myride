@@ -274,5 +274,43 @@ def add_trip(driver_id, passenger_id, price):
         finally:
             cursor.close()
             connection.close()
-    
 
+# Admin dashboard
+def admin_dashboard():
+    connection = connect_db()
+    if connection:
+        print("Welcome to the Admin Dashboard!")
+        while True:
+            print("\nMenu:")
+            print("1. View Drivers")
+            print("2. View Passengers")
+            print("3. Exit")
+            choice = input("Enter your choice: ")
+            
+            if choice == '1':
+                view_drivers(connection)
+            elif choice == '2':
+                view_passengers(connection)
+            elif choice == '3':
+                print("Exiting Admin Dashboard...")
+                break
+            else:
+                print("Invalid choice. Please try again.")
+        connection.close()
+
+def view_drivers(connection):
+    try:
+        cursor = connection.cursor()
+        query = "SELECT * FROM driver"
+        cursor.execute(query)
+        drivers = cursor.fetchall()
+        if drivers:
+            print("Driver Details:")
+            for driver in drivers:
+                print(f"ID: {driver[0]}, Name: {driver[1]}, Phone: {driver[2]}, Seats Available: {driver[4]}, Location: {driver[5]}, Destination: {driver[6]}")
+        else:
+            print("No drivers available.")
+    except Error as e:
+        print(f"Error: {e}")
+    finally:
+        cursor.close()
