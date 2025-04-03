@@ -457,3 +457,37 @@ def view_passengers_trips(connection):
     finally:
         cursor.close()
 
+
+def view_drivers(connection):
+    try:
+        cursor = connection.cursor()
+        query = "SELECT * FROM driver"
+        cursor.execute(query)
+        drivers = cursor.fetchall()
+        if drivers:
+            print("Driver Details:")
+            for driver in drivers:
+                print(f"ID: {driver[0]}, Name: {driver[1]}, Phone: {driver[2]}, Seats Available: {driver[4]}, Location: {driver[5]}, Destination: {driver[6]}")
+        else:
+            print("No drivers available.")
+    except Error as e:
+        print(f"Error: {e}")
+    finally:
+        cursor.close()
+
+def view_passengers(connection):
+    try:
+        cursor = connection.cursor()
+        query = "SELECT * FROM Passenger"
+        cursor.execute(query)
+        passengers = cursor.fetchall()
+        if passengers:
+            print("Passenger Details:")
+            for passenger in passengers:
+                print(f"ID: {passenger[0]}, Name: {passenger[1]}, Phone: {passenger[2]}, Pickup Location: {passenger[3]}, Destination: {passenger[4]}")
+        else:
+            print("No passengers registered.")
+    except Error as e:
+        print(f"Error: {e}")
+    finally:
+        cursor.close()
