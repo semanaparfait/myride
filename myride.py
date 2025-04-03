@@ -192,3 +192,66 @@ def driver_login(connection):
         print("Unable to connect to database")
         return None
 
+
+#passenger kilometers calculations
+def calculate_ride_cost():
+    global destination
+    global current_location
+   
+    # Initialize geocoder
+    geolocator = Nominatim(user_agent="myride_app")
+    
+    # Get current location
+    current_location = input("Enter your current location: ")
+    try:
+        current_loc = geolocator.geocode(current_location)
+        if not current_loc:
+            print("Sorry, couldn't find your current location. Please try again with a more specific address.")
+            return
+        print(f"Found: {current_loc.address}")
+        current_coords = (current_loc.latitude, current_loc.longitude)
+    except Exception as e:
+        print(f"Error finding location: {e}")
+        return
+    
+    # Get destination
+    destination = input("Enter your destination: ")
+    try:
+        dest_loc = geolocator.geocode(destination)
+        if not dest_loc:
+            print("Sorry, couldn't find your destination. Please try again with a more specific address.")
+            return
+        print(f"Found: {dest_loc.address}")
+        dest_coords = (dest_loc.latitude, dest_loc.longitude)
+    except Exception as e:
+        print(f"Error finding destination: {e}")
+        return
+    
+    # Calculate distance
+    distance_km = geodesic(current_coords, dest_coords).kilometers
+    
+    # Round up to nearest 0.1 km
+    distance_km = math.ceil(distance_km * 10) / 10
+    
+    # Calculate cost (500 RWF per km)
+    cost_rwf = distance_km * 500
+    # return cost_rwf
+    
+    # Display results
+    print("\n" + "=" * 50)
+    print(f"OOh thanks for using our system")
+    print("=" * 50)
+    print(f"From: {current_loc.address}")
+    print(f"To: {dest_loc.address}")
+    print(f"Distance: {distance_km:.1f} kilometers")
+    print(f"Cost: {cost_rwf:.0f} RWF (at 350 RWF per kilometer)")
+    print("This the cost per kilometer and per person")
+    print("=" * 50)
+    
+    return {
+        "from": current_loc.address,
+        "to": dest_loc.address,
+        "distance_km": distance_km,
+        "cost_rwf": cost_rwf
+    }
+    
