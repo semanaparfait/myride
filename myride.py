@@ -255,3 +255,156 @@ def calculate_ride_cost():
         "cost_rwf": cost_rwf
     }
     
+
+
+# Passenger registration
+
+def add_passenger():
+    global passenger_name,passenger_phone
+    connection = connect_db()
+    print("\n Passenger options:")
+    print("1. Register as passenger")
+    print("2. Book a trip")
+    print("3. Available Drivers")
+    print("4. Go back")
+    passenger_choice=input("Enter your choice: ")
+    if passenger_choice.lower() == "1":
+        if connection:
+            passenger_choice_yes_no = input("Do you really want to register as a passenger? (yes/no): ")
+            if passenger_choice_yes_no.lower() == "no":
+                return
+            elif passenger_choice_yes_no.lower() == "yes":
+                print("\nEnter your details to register")
+                passenger_name = input("\nEnter your name: ")
+                while True:
+                    passenger_phone = input("Enter your phone number: ")
+                    if len(passenger_phone) == 10 and passenger_phone.isdigit():
+                        break
+                    print("invalid phone number ❌ (must be exactly 10 digits)")
+                calculate_ride_cost()
+                try:
+                    cursor = connection.cursor()
+                    insert_query = """
+                    INSERT INTO Passenger (PassengerName, PassengerPhoneNumber,PickupLocation ,Destination)
+                    VALUES (%s, %s, %s, %s)
+                    """
+                    cursor.execute(insert_query, (passenger_name, passenger_phone, current_location, destination ))
+                    connection.commit()
+                    print(f"Passenger {passenger_name} registered successfully!")
+                except Error as e:
+                    print(f"Error: {e}")
+                finally:
+                    cursor.close()
+                    connection.close()
+            else:
+                print("Invalid choice. Please enter 'yes' or 'no'.")
+                return
+    if passenger_choice.lower() == "2":
+        while True:
+            trip_choice_yes_no=input("\n Do you really need to book a trip with MY RIDE? (yes/no): ")
+            if trip_choice_yes_no.lower() == "no":
+                return
+            elif trip_choice_yes_no.lower() == "yes":
+                booking_trip_as_team()
+                break
+            else:
+                print("Invalid choice. Please enter 'yes' or 'no'. if you want to book a trip with MY RIDE")
+    if passenger_choice.lower() == "3":
+        passenger_view_driver = input("\n In which Destination you want to go: ")
+        query = """
+           SELECT Destination FROM driver Where Destination = %s
+           """
+        # print(query)
+
+        # pickup_location = input("Enter your pickup location: ")
+        # destination = input("Enter your destination: ")
+        
+        
+
+    # Match drivers and passengers
+
+
+def match_driver_to_passenger():
+        connection = connect_db()
+        if connection:
+            passenger_currentLocation= input("Enter your current location: ")
+            passenger_destination = input("Enter your destination: ")
+            try:
+                cursor = connection.cursor()
+                query = """
+                SELECT * FROM driver WHERE Destination = %s AND AvailableSeats > 0
+                """
+                cursor.execute(query, (passenger_destination,))
+                drivers = cursor.fetchall()
+                if drivers:
+                    print("Available drivers:")
+                    for driver in drivers:
+                        print(f"Driver Name: {driver[1]}, Phone: {driver[3]}, Seats Available: {driver[4]}, Location: {driver[5]}")
+                        while True:
+                            bookirde=input("Do you want to book a ride with this driver? (yes/no): ")
+                            if bookirde.lower() == "yes":
+                                add_passenger()
+                                break
+                else:
+                    print("No drivers available for your destination.")
+
+            except Error as e:
+                print(f"Error: {e}")
+            finally:
+                cursor.close()
+                connection.close()
+
+#booking trip as team on passengers
+def booking_trip_as_team():
+    global current_location,destination, distance_km
+    connection = connect_db()
+    if connection:
+        team_name = input("Enter team name: ")
+        while True:
+            team_members = input("Enter team members: ")
+            if team_members.isdigit():
+                team_members = int(team_members)
+                if team_members <= 8 and int(team_members) >= 2:
+                    print(f"Great! {team_name} has {team_members} members. Proceeding with booking...")
+                    calculate_ride_cost()
+                    break
+                else:
+                    print(f"Sorry ,{team_name} team we can't afford {team_members} size should be less than 8 people")
+            else:
+                print("Invalid input. Please enter a valid number of team members.")
+        # team_current_location = input("Enter team current location: ")
+        # team_destination = input("Enter team destination: ")
+         # Calculate cost (500 RWF per km)
+        # cost_rwf = distance_km * 500
+        # calculate_ride_cost(distance_km)
+        # total_cost = calculate_ride_cost(distance_km) * team_members
+        # print(f"Total cost for this trip: {total_cost} RWF (for {distance_km} km)")
+        
+        try:
+            cursor = connection.cursor()
+            Driv_query = """
+            INSERT INTO passengerstrips(passengerTeamName, passengerteammember, TripPickupLocation, TripDestination) VALUES (%s, %s, %s, %s)
+            
+            """
+            cursor.execute(Driv_query, ( team_name ,team_members, current_location, destination))
+            connection.commit()
+
+            cursor.execute("SELECT * FROM driver WHERE Destination = %s AND CurrentLocation = %s", (destination, current_location))
+
+            drivers_table = cursor.fetchall()
+            if drivers_table:
+                print("Available drivers who can pick you:")
+                for driver in drivers_table:
+                    # if team_current_location == current_location and team_destination == destination :
+                    print("Trip booked successfully")
+                    print(f"Driver called: {driver[1]}, and has {driver[4]} seats car available in car he is on the way to {driver[5]} picking you! wait a few seconds")                       
+            else:
+                print(f"No Driver available in this current location.!! Please wait while we are looking For ur driver.")     
+                          
+                          # if team_members >= available_seats and team_current_location ==current_location and team_destination == destination :
+
+        except Error as e:
+            print(f"Error: {e}")
+        finally:
+            cursor.close()
+            connection.close()
