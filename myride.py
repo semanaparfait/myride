@@ -408,3 +408,52 @@ def booking_trip_as_team():
         finally:
             cursor.close()
             connection.close()
+
+
+# Admin dashboard
+def admin_dashboard():
+    connection = connect_db()
+    if connection:
+        print("Welcome to the Admin Dashboard!")
+        while True:
+            print("\nMenu:")
+            print("1. View Drivers")
+            print("2. View Passengers")
+            print("3. View Trips")
+            print("4. View Payments")
+            print("5. Exit")
+        
+            choice = input("Enter your choice: ")
+            
+            if choice == '1':
+                view_drivers(connection)
+            elif choice == '2':
+                view_passengers(connection)
+            elif choice == '3':
+                view_passengers_trips(connection)
+            elif choice == '4':
+                print("Payment methos is not implemented yet becouse we are still in development phase and no APIs")
+            elif choice == '5':
+                print("Exiting Admin Dashboard...")
+                break
+            else:
+                print("Invalid choice. Please try again.")
+        connection.close()
+
+def view_passengers_trips(connection):
+    try:
+        cursor = connection.cursor()
+        querypasstrip = "SELECT * FROM passengerstrips"
+        cursor.execute(querypasstrip)
+        passengerstrip= cursor.fetchall()
+        if passengerstrip:
+            print("Passenger Details:")
+            for passengerstrips in passengerstrip:
+                print(f"ID: {passengerstrips[0]}, Name: {passengerstrips[1]}, Phone: {passengerstrips[2]}, Pickup Location: {passengerstrips[3]}, Destination: {passengerstrips[4]}")
+        else:
+            print("No passengers registered.")
+    except Error as e:
+        print(f"Error: {e}")
+    finally:
+        cursor.close()
+
